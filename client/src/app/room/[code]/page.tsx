@@ -3,15 +3,15 @@ import DisplayPage from "./DisplayPage";
 
 interface PageProps {
   params: {
-    feedback: string;
+    code: string;
   };
 }
 
-const Feedback = async ({ params }: PageProps) => {
-  const { feedback } = params;
+const Room = async ({ params }: PageProps) => {
+  const { code } = params;
 
   const initialData = await redis.zrange<(string | number)[]>(
-    `room:${feedback}`,
+    `room:${code}`,
     0,
     49,
     {
@@ -20,7 +20,7 @@ const Feedback = async ({ params }: PageProps) => {
   );
   const words: { text: string; value: number }[] = [];
 
-  for (let i = 0; i < initialData.length; i++) {
+  for (let i = 0; i < initialData.length; i += 2) {
     const [text, value] = initialData.slice(i, i + 2);
 
     if (typeof text === "string" && typeof value === "number") {
@@ -28,7 +28,7 @@ const Feedback = async ({ params }: PageProps) => {
     }
   }
   await redis.incr("served-requests");
-  return <DisplayPage initialData={words} feedbackName={feedback} />;
+  return <DisplayPage initialData={words} roomCode={code} />;
 };
 
-export default Feedback;
+export default Room;

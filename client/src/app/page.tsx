@@ -1,6 +1,6 @@
 import SectionContainer from "@/components/SectionContainer";
 import { Icons } from "../../public/icons";
-import FeedbackContainer from "@/components/FeedbackContainer";
+import RoomContainer from "@/components/RoomContainer";
 import { Star } from "lucide-react";
 import { redis } from "@/lib/redis";
 
@@ -15,16 +15,13 @@ export default async function Home() {
         </div>
         <div className="px-6 lg:px-0 lg:pt-4">
           <div className="relative mx-auto text-center flex flex-col items-center">
-            <h1
-              className="relative leading-snug w-fit tracking-tight
-text-balance mt—16 font-bold text—gray-900 text-5xl md:text—6xl"
-            >
+            <h1 className="relative leading-snug w-fit tracking-tight text-balance mt-16 font-bold text-gray-900 text-5xl md:text-6xl">
               What do you{" "}
               <span className="whitespace-nowrap">
                 th
                 <span className="relative">
                   i
-                  <span className="absolute inset-x—0 -top-2 -translate-x-3">
+                  <span className="absolute inset-x-0 -top-2 -translate-x-3">
                     <Icons.brain className="h-7 w-7 md:h-8 md:w-8" />
                   </span>
                 </span>
@@ -33,7 +30,7 @@ text-balance mt—16 font-bold text—gray-900 text-5xl md:text—6xl"
               about...
             </h1>
 
-            <FeedbackContainer />
+            <RoomContainer />
 
             <div className="mt-12 flex flex-col sm:flex-row items-center sm:items-start gap-5 ">
               <div className="flex flex-col gap-1 justify-between items-center sm:items-start">
