@@ -14,7 +14,7 @@ const subRedis = new Redis(process.env.REDIS_CONNECTION_STRING);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://feeditback.vercel.app/"],
+    origin: ["http://localhost:3000", "https://your-production-url.com"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -45,7 +45,6 @@ io.on("connection", async (socket) => {
           console.error("Failed to subscribe:", err);
         } else {
           await redis.sadd("subscribed-rooms", room);
-
           console.log("Subscribed to room:", room);
         }
       });
@@ -73,7 +72,6 @@ io.on("connection", async (socket) => {
             console.error("Failed to unsubscribe", err);
           } else {
             await redis.srem("subscribed-rooms", room);
-
             console.log("Unsubscribed from room:", room);
           }
         });
