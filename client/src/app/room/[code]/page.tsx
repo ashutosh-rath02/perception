@@ -18,17 +18,17 @@ const Room = async ({ params }: PageProps) => {
       withScores: true,
     }
   );
-  const words: { text: string; value: number }[] = [];
+  const sentences: { text: string; value: number }[] = [];
 
   for (let i = 0; i < initialData.length; i += 2) {
     const [text, value] = initialData.slice(i, i + 2);
 
     if (typeof text === "string" && typeof value === "number") {
-      words.push({ text, value });
+      sentences.push({ text, value });
     }
   }
   await redis.incr("served-requests");
-  return <DisplayPage initialData={words} roomCode={code} />;
+  return <DisplayPage initialData={sentences} roomCode={code} />;
 };
 
 export default Room;

@@ -30,17 +30,20 @@ export const createRoom = async () => {
   redirect(`/room/${roomCode}`);
 };
 
-function wordFreq(text: string): { text: string; value: number }[] {
-  const words: string[] = text.replace(/\./g, "").split(/\s/);
+function sentenceFreq(text: string): { text: string; value: number }[] {
+  const sentences = text
+    .split(/[.!?]+/)
+    .filter((sentence) => sentence.trim() !== "");
   const freqMap: Record<string, number> = {};
 
-  for (const w of words) {
-    if (!freqMap[w]) freqMap[w] = 0;
-    freqMap[w] += 1;
+  for (const sentence of sentences) {
+    const trimmedSentence = sentence.trim();
+    if (!freqMap[trimmedSentence]) freqMap[trimmedSentence] = 0;
+    freqMap[trimmedSentence] += 1;
   }
-  return Object.keys(freqMap).map((word) => ({
-    text: word,
-    value: freqMap[word],
+  return Object.keys(freqMap).map((sentence) => ({
+    text: sentence,
+    value: freqMap[sentence],
   }));
 }
 
@@ -51,21 +54,21 @@ export const submitFeedback = async ({
   feedback: string;
   roomCode: string;
 }) => {
-  const words = wordFreq(feedback);
+  const sentences = sentenceFreq(feedback);
   await Promise.all(
-    words.map(async (word) => {
+    sentences.map(async (sentence) => {
       await redis.zadd(
         `room:${roomCode}`,
         {
           incr: true,
         },
-        { member: word.text, score: word.value }
+        { member: sentence.text, score: sentence.value }
       );
     })
   );
 
   await redis.incr("served-requests");
-  await redis.publish(`room:${roomCode}`, JSON.stringify(words));
+  await redis.publish(`room:${roomCode}`, JSON.stringify(sentences));
 
   return feedback;
 };
