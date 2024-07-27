@@ -3,7 +3,6 @@
 import { redis } from "@/lib/redis";
 import { redirect } from "next/navigation";
 
-// Function to generate a random room code
 function generateRoomCode(length: number = 6): string {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let result = "";

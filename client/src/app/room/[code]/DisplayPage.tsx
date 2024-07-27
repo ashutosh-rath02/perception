@@ -10,8 +10,8 @@ import { io } from "socket.io-client";
 import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
 
-// const socket = io("http://localhost:8080");
-const socket = io("https://feedback-zk2h.onrender.com");
+const socket = io("http://localhost:8080");
+// const socket = io("https://feedback-zk2h.onrender.com");
 
 interface DisplayPageProps {
   roomCode: string;
@@ -108,7 +108,7 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-between min-h-screen bg-grid-zinc-50 py-8">
+    <div className="w-full flex flex-col items-center justify-between min-h-screen">
       <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl">
         <div className="flex justify-between items-center w-full">
           <h1 className="text-3xl font-bold text-gray-900">
@@ -118,9 +118,6 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
             Take Screenshot
           </Button>
         </div>
-
-        <p className="text-sm">(updated in real-time)</p>
-
         <div
           ref={feedbackRef}
           className="relative w-full h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden bg-white"
