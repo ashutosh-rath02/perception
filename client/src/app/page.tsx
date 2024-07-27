@@ -11,7 +11,7 @@ export default async function Home() {
 
   return (
     <section className="min-h-screen">
-      <SectionContainer className="relative pb-24 pt-10 sm:pb-32 lg:pt-25 xl:pt-32 lg:pb-52">
+      <SectionContainer className="relative pb-24 sm:pb-32 lg:pt-5 xl:pt-2 lg:pb-52">
         <div className="absolute inset-0 top-8">
           <div className="h-full w-full dark:bg-black bg-white dark:bg-dot-white/[0.2] bg-dot-black/[0.2] relative">
             {/* Radial gradient for the container to give a faded look */}

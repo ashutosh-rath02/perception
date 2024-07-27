@@ -9,7 +9,6 @@ import { submitFeedback } from "../../actions";
 import { io } from "socket.io-client";
 import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
-import DotBackground from "@/components/DotBackground";
 
 const socket = io("http://localhost:8080");
 // const socket = io("https://feedback-zk2h.onrender.com");
