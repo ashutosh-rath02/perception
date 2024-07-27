@@ -1,7 +1,7 @@
 "use client";
 
 import SectionContainer from "@/components/SectionContainer";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { submitFeedback } from "../../actions";
 import { io } from "socket.io-client";
 import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
+import DotBackground from "@/components/DotBackground";
 
 const socket = io("http://localhost:8080");
 // const socket = io("https://feedback-zk2h.onrender.com");
@@ -26,23 +27,55 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
     [key: string]: { x: number; y: number };
   }>({});
 
-  const generatePositions = useCallback(
-    (newSentences: typeof sentences) => {
-      const newPositions: { [key: string]: { x: number; y: number } } = {};
-      newSentences.forEach((sentence) => {
-        if (!positions[sentence.text]) {
-          newPositions[sentence.text] = {
-            x: Math.random() * 60,
-            y: Math.random() * 80,
-          };
-        } else {
-          newPositions[sentence.text] = positions[sentence.text];
-        }
-      });
-      setPositions(newPositions);
-    },
-    [positions]
-  );
+  const generateRandomColor = () => {
+    return (
+      "rgb(" +
+      (Math.floor(Math.random() * 56) + 200) +
+      ", " +
+      (Math.floor(Math.random() * 56) + 200) +
+      ", " +
+      (Math.floor(Math.random() * 56) + 200) +
+      ")"
+    );
+  };
+
+  const generatePositions = useCallback((newSentences: typeof sentences) => {
+    const boxWidth = 150;
+    const boxHeight = 60;
+    const containerWidth = 800;
+    const containerHeight = 500;
+    const padding = 10;
+
+    const newPositions: { [key: string]: { x: number; y: number } } = {};
+
+    newSentences.forEach((sentence) => {
+      let x: number, y: number;
+      let attempts = 0;
+      const maxAttempts = 50;
+
+      do {
+        x = Math.random() * (containerWidth - boxWidth - 2 * padding) + padding;
+        y =
+          Math.random() * (containerHeight - boxHeight - 2 * padding) + padding;
+
+        attempts++;
+      } while (
+        // Check for overlaps (simplified)
+        Object.values(newPositions).some(
+          (pos) =>
+            Math.abs(pos.x - x) < boxWidth && Math.abs(pos.y - y) < boxHeight
+        ) &&
+        attempts < maxAttempts
+      );
+
+      newPositions[sentence.text] = {
+        x: x,
+        y: y,
+      };
+    });
+
+    setPositions(newPositions);
+  }, []);
 
   useEffect(() => {
     generatePositions(sentences);
@@ -82,6 +115,16 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
     };
   }, [roomCode, generatePositions]);
 
+  const generateColorMap = useCallback(() => {
+    const colorMap: { [key: string]: string } = {};
+    sentences.forEach((sentence) => {
+      colorMap[sentence.text] = generateRandomColor();
+    });
+    return colorMap;
+  }, [sentences]);
+
+  const colorMap = useMemo(() => generateColorMap(), [generateColorMap]);
+
   const { mutate, isPending } = useMutation({
     mutationFn: submitFeedback,
     onSuccess: (data) => {
@@ -120,19 +163,25 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
         </div>
         <div
           ref={feedbackRef}
-          className="relative w-full h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden bg-white"
+          className="background relative w-full h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden"
         >
           {sentences.map((sentence) => (
             <motion.div
               key={sentence.text}
-              className="absolute bg-white p-2 rounded shadow"
+              className="absolute p-2 rounded-lg shadow"
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               style={{
-                left: `${positions[sentence.text]?.x ?? 0}%`,
-                top: `${positions[sentence.text]?.y ?? 0}%`,
+                left: `${positions[sentence.text]?.x ?? 0}px`,
+                top: `${positions[sentence.text]?.y ?? 0}px`,
                 fontSize: `${Math.min(14 + sentence.value, 24)}px`,
-                maxWidth: "80%",
+                width: "150px",
+                backgroundColor:
+                  colorMap[sentence.text] || generateRandomColor(),
+                color: "black",
+                overflow: "hidden",
+                textOverflow: "wrap",
+                whiteSpace: "wrap",
               }}
             >
               {sentence.text}
