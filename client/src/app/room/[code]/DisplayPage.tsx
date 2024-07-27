@@ -9,6 +9,7 @@ import { submitFeedback } from "../../actions";
 import { io } from "socket.io-client";
 import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
+import ShareDropdown from "@/components/ShareDropdown";
 
 const socket = io("http://localhost:8080");
 // const socket = io("https://feedback-zk2h.onrender.com");
@@ -156,9 +157,12 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
           <h1 className="text-3xl font-bold text-gray-900">
             Room: <span className="text-blue-600">{roomCode}</span>
           </h1>
-          <Button onClick={takeScreenshot} variant="outline">
-            Take Screenshot
-          </Button>
+          <div className="flex gap-2">
+            <ShareDropdown roomCode={roomCode} />
+            <Button onClick={takeScreenshot} variant="outline">
+              Take Screenshot
+            </Button>
+          </div>
         </div>
         <div
           ref={feedbackRef}
