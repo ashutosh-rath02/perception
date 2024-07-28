@@ -23,6 +23,7 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
   const [sentences, setSentences] = useState(initialData);
   const [input, setInput] = useState("");
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const [expandedSentence, setExpandedSentence] = useState<string | null>(null);
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number };
   }>({});
@@ -74,12 +75,12 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
       };
     });
 
-    setPositions(newPositions);
+    return newPositions;
   }, []);
 
   useEffect(() => {
-    generatePositions(sentences);
-  }, []);
+    setPositions(generatePositions(sentences));
+  }, [sentences, generatePositions]);
 
   useEffect(() => {
     socket.emit("join-room", `room:${roomCode}`);
@@ -150,68 +151,87 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
     }
   };
 
-  return (
-    <div className="w-full flex flex-col items-center justify-between min-h-screen">
-      <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl">
-        <div className="flex justify-between items-center w-full">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Room: <span className="text-blue-600">{roomCode}</span>
-          </h1>
-          <div className="flex gap-2">
-            <ShareDropdown roomCode={roomCode} />
-            <Button onClick={takeScreenshot} variant="outline">
-              Take Screenshot
-            </Button>
-          </div>
-        </div>
-        <div
-          ref={feedbackRef}
-          className="background relative w-full h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden"
-        >
-          {sentences.map((sentence) => (
-            <motion.div
-              key={sentence.text}
-              className="absolute p-2 rounded-lg shadow"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              style={{
-                left: `${positions[sentence.text]?.x ?? 0}px`,
-                top: `${positions[sentence.text]?.y ?? 0}px`,
-                fontSize: `${Math.min(14 + sentence.value, 24)}px`,
-                width: "150px",
-                backgroundColor:
-                  colorMap[sentence.text] || generateRandomColor(),
-                color: "black",
-                overflow: "hidden",
-                textOverflow: "wrap",
-                whiteSpace: "wrap",
-              }}
-            >
-              {sentence.text}
-            </motion.div>
-          ))}
-        </div>
+  const handleDrag = (
+    sentenceText: string,
+    e: any,
+    data: { x: number; y: number }
+  ) => {
+    setPositions((prevPositions) => ({
+      ...prevPositions,
+      [sentenceText]: { x: data.x, y: data.y },
+    }));
+  };
 
-        <div className="w-full max-w-lg">
-          <div className="mt-1 flex gap-2 items-center">
-            <Input
-              value={input}
-              onChange={({ target }) => setInput(target.value)}
-              placeholder="Enter your feedback..."
-              className="flex-grow"
-            />
-            <Button
-              disabled={isPending}
-              onClick={() => {
-                mutate({ feedback: input, roomCode });
-                setInput("");
-              }}
-            >
-              Share
-            </Button>
+  const handleSentenceClick = (sentenceText: string) => {
+    setExpandedSentence(
+      expandedSentence === sentenceText ? null : sentenceText
+    );
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center justify-between min-h-screen relative">
+      <div className="relative w-full h-full bg-white rounded-lg overflow-hidden">
+        <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl">
+          <div className="flex justify-between items-center w-full">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Room: <span className="text-blue-600">{roomCode}</span>
+            </h1>
+            <div className="flex gap-2">
+              <ShareDropdown roomCode={roomCode} />
+              <Button onClick={takeScreenshot} variant="outline">
+                Take Screenshot
+              </Button>
+            </div>
           </div>
-        </div>
-      </SectionContainer>
+          <div
+            ref={feedbackRef}
+            className="relative w-full h-[500px] border border-gray-400 shadow-xl rounded-lg p-4 overflow-hidden"
+          >
+            {sentences.map((sentence) => (
+              <motion.div
+                key={sentence.text}
+                className="absolute p-2 rounded-lg shadow"
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{
+                  left: `${positions[sentence.text]?.x ?? 0}px`,
+                  top: `${positions[sentence.text]?.y ?? 0}px`,
+                  fontSize: `${Math.min(14 + sentence.value, 24)}px`,
+                  width: "150px",
+                  backgroundColor:
+                    colorMap[sentence.text] || generateRandomColor(),
+                  color: "black",
+                  overflow: "hidden",
+                  textOverflow: "wrap",
+                  whiteSpace: "wrap",
+                }}
+              >
+                {sentence.text}
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="w-full max-w-lg">
+            <div className="mt-1 flex gap-2 items-center">
+              <Input
+                value={input}
+                onChange={({ target }) => setInput(target.value)}
+                placeholder="Enter your feedback..."
+                className="flex-grow"
+              />
+              <Button
+                disabled={isPending}
+                onClick={() => {
+                  mutate({ feedback: input, roomCode });
+                  setInput("");
+                }}
+              >
+                Share
+              </Button>
+            </div>
+          </div>
+        </SectionContainer>
+      </div>
     </div>
   );
 };

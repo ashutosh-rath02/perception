@@ -51,7 +51,7 @@ export default function RootLayout({
                     href="https://github.com/ashutosh-rath02"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mx-2 hover:text-gray-300"
+                    className="mx-2 hover:text-gray-800"
                   >
                     GitHub
                   </a>
@@ -60,7 +60,7 @@ export default function RootLayout({
                     href="https://linkedin.com/in/rathashutosh"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mx-2 hover:text-gray-300"
+                    className="mx-2 hover:text-gray-800"
                   >
                     LinkedIn
                   </a>
@@ -69,7 +69,7 @@ export default function RootLayout({
                     href="https://twitter.com/v_ashu_dev"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mx-2 hover:text-gray-300"
+                    className="mx-2 hover:text-gray-800"
                   >
                     Twitter
                   </a>
