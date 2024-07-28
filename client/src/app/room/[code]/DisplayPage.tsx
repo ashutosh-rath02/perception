@@ -11,8 +11,8 @@ import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
 import ShareDropdown from "@/components/ShareDropdown";
 
-const socket = io("http://localhost:8080");
-// const socket = io("https://feedback-zk2h.onrender.com");
+// const socket = io("http://localhost:8080");
+const socket = io("https://feedback-zk2h.onrender.com");
 
 interface DisplayPageProps {
   roomCode: string;
@@ -23,10 +23,10 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
   const [sentences, setSentences] = useState(initialData);
   const [input, setInput] = useState("");
   const feedbackRef = useRef<HTMLDivElement>(null);
-  const [expandedSentence, setExpandedSentence] = useState<string | null>(null);
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number };
   }>({});
+  const [expandedSentence, setExpandedSentence] = useState<string | null>(null);
 
   const generateRandomColor = () => {
     return (
@@ -58,10 +58,8 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
         x = Math.random() * (containerWidth - boxWidth - 2 * padding) + padding;
         y =
           Math.random() * (containerHeight - boxHeight - 2 * padding) + padding;
-
         attempts++;
       } while (
-        // Check for overlaps (simplified)
         Object.values(newPositions).some(
           (pos) =>
             Math.abs(pos.x - x) < boxWidth && Math.abs(pos.y - y) < boxHeight
@@ -69,10 +67,7 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
         attempts < maxAttempts
       );
 
-      newPositions[sentence.text] = {
-        x: x,
-        y: y,
-      };
+      newPositions[sentence.text] = { x, y };
     });
 
     return newPositions;
@@ -106,7 +101,6 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
         const updatedSentences = newSentences
           .sort((a, b) => b.value - a.value)
           .slice(0, 50);
-        generatePositions(updatedSentences);
         return updatedSentences;
       });
     });
@@ -114,7 +108,7 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
     return () => {
       socket.off("room-update");
     };
-  }, [roomCode, generatePositions]);
+  }, [roomCode]);
 
   const generateColorMap = useCallback(() => {
     const colorMap: { [key: string]: string } = {};
@@ -134,7 +128,6 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
         const updated = [...prev, newSentence]
           .sort((a, b) => b.value - a.value)
           .slice(0, 50);
-        generatePositions(updated);
         return updated;
       });
     },
@@ -151,17 +144,6 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
     }
   };
 
-  const handleDrag = (
-    sentenceText: string,
-    e: any,
-    data: { x: number; y: number }
-  ) => {
-    setPositions((prevPositions) => ({
-      ...prevPositions,
-      [sentenceText]: { x: data.x, y: data.y },
-    }));
-  };
-
   const handleSentenceClick = (sentenceText: string) => {
     setExpandedSentence(
       expandedSentence === sentenceText ? null : sentenceText
@@ -169,69 +151,69 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-between min-h-screen relative">
-      <div className="relative w-full h-full bg-white rounded-lg overflow-hidden">
-        <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl">
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Room: <span className="text-blue-600">{roomCode}</span>
-            </h1>
-            <div className="flex gap-2">
-              <ShareDropdown roomCode={roomCode} />
-              <Button onClick={takeScreenshot} variant="outline">
-                Take Screenshot
-              </Button>
-            </div>
+    <div className="w-full flex flex-col items-center justify-between min-h-screen">
+      <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl">
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Room: <span className="text-blue-600">{roomCode}</span>
+          </h1>
+          <div className="flex gap-2">
+            <ShareDropdown roomCode={roomCode} />
+            <Button onClick={takeScreenshot} variant="outline">
+              Take Screenshot
+            </Button>
           </div>
-          <div
-            ref={feedbackRef}
-            className="relative w-full h-[500px] border border-gray-400 shadow-xl rounded-lg p-4 overflow-hidden"
-          >
-            {sentences.map((sentence) => (
-              <motion.div
-                key={sentence.text}
-                className="absolute p-2 rounded-lg shadow"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                style={{
-                  left: `${positions[sentence.text]?.x ?? 0}px`,
-                  top: `${positions[sentence.text]?.y ?? 0}px`,
-                  fontSize: `${Math.min(14 + sentence.value, 24)}px`,
-                  width: "150px",
-                  backgroundColor:
-                    colorMap[sentence.text] || generateRandomColor(),
-                  color: "black",
-                  overflow: "hidden",
-                  textOverflow: "wrap",
-                  whiteSpace: "wrap",
-                }}
-              >
-                {sentence.text}
-              </motion.div>
-            ))}
-          </div>
+        </div>
+        <div
+          ref={feedbackRef}
+          className="background relative w-full h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden"
+        >
+          {sentences.map((sentence) => (
+            <motion.div
+              key={sentence.text}
+              className="absolute p-2 rounded-lg shadow cursor-pointer"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              style={{
+                fontSize: `${Math.min(14 + sentence.value, 24)}px`,
+                width: "150px",
+                backgroundColor:
+                  colorMap[sentence.text] || generateRandomColor(),
+                color: "black",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace:
+                  expandedSentence === sentence.text ? "normal" : "nowrap",
+                left: positions[sentence.text]?.x || 0,
+                top: positions[sentence.text]?.y || 0,
+              }}
+              onClick={() => handleSentenceClick(sentence.text)}
+            >
+              {sentence.text}
+            </motion.div>
+          ))}
+        </div>
 
-          <div className="w-full max-w-lg">
-            <div className="mt-1 flex gap-2 items-center">
-              <Input
-                value={input}
-                onChange={({ target }) => setInput(target.value)}
-                placeholder="Enter your feedback..."
-                className="flex-grow"
-              />
-              <Button
-                disabled={isPending}
-                onClick={() => {
-                  mutate({ feedback: input, roomCode });
-                  setInput("");
-                }}
-              >
-                Share
-              </Button>
-            </div>
+        <div className="w-full max-w-lg">
+          <div className="mt-1 flex gap-2 items-center">
+            <Input
+              value={input}
+              onChange={({ target }) => setInput(target.value)}
+              placeholder="Enter your feedback..."
+              className="flex-grow"
+            />
+            <Button
+              disabled={isPending}
+              onClick={() => {
+                mutate({ feedback: input, roomCode });
+                setInput("");
+              }}
+            >
+              Share
+            </Button>
           </div>
-        </SectionContainer>
-      </div>
+        </div>
+      </SectionContainer>
     </div>
   );
 };
