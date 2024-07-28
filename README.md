@@ -7,7 +7,7 @@ This project is a real-time feedback system that allows users to join rooms, sub
 - Real-time feedback updates using Socket.IO
 - Room management and user connection handling with Redis
 - Screenshot functionality in the client application
-- Gradient background with floating feedback container
+- Floating feedback container with sharing feature
 
 ## Technologies
 
