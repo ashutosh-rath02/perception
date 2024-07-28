@@ -7,27 +7,17 @@ import { FlipWords } from "@/components/ui/flip-words";
 
 export default async function Home() {
   const servedRequests = await redis.get("served-requests");
-  const flipWords = ["innovative", "engaging", "insightful", "powerful"];
+  const flipWords = ["Events", "Workshops", "Conferences", "Gatherings"];
 
   return (
     <section className="min-h-screen">
       <SectionContainer className="relative pb-24 sm:pb-32 lg:pt-5 xl:pt-2 lg:pb-52">
-        <div className="absolute inset-0 top-8">
-          <div className="h-full w-full dark:bg-black bg-white dark:bg-dot-white/[0.2] bg-dot-black/[0.2] relative">
-            {/* Radial gradient for the container to give a faded look */}
-            <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-          </div>
-        </div>
         <div className="px-6 lg:px-0 lg:pt-4">
           <div className="relative mx-auto text-center flex flex-col items-center">
             <h1 className="relative leading-snug w-3/4 tracking-tight text-balance mt-16 font-bold text-gray-900 text-5xl md:text-6xl">
-              Share Your Thoughts with Us!
+              Uncover Insights <br /> from Your{" "}
+              <FlipWords words={flipWords} className="text-blue-600" />.
             </h1>
-
-            <div className="mt-8 text-2xl font-semibold text-neutral-600 dark:text-neutral-400">
-              Create <FlipWords words={flipWords} /> feedback in real-time
-            </div>
-
             <RoomContainer />
 
             <div className="mt-12 flex flex-col sm:flex-row items-center sm:items-start gap-5">

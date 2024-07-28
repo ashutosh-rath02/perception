@@ -71,3 +71,8 @@ export const submitFeedback = async ({
 
   return feedback;
 };
+
+export const checkRoomExists = async (roomCode: string): Promise<boolean> => {
+  const exists = await redis.sismember("existing-rooms", roomCode);
+  return exists === 1;
+};

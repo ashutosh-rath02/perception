@@ -4,8 +4,9 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useMutation } from "@tanstack/react-query";
-import { createRoom } from "@/app/actions";
+import { createRoom, checkRoomExists } from "@/app/actions";
 import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
 
 const RoomContainer = () => {
   const [joinCode, setJoinCode] = useState<string>("");
@@ -13,17 +14,45 @@ const RoomContainer = () => {
 
   const {
     mutate: createNewRoom,
-    error,
-    isPending,
+    error: createError,
+    isPending: isCreatePending,
   } = useMutation({
     mutationFn: createRoom,
+    onSuccess: (roomCode) => {
+      if (roomCode) {
+        router.push(`/room/${roomCode}`);
+      }
+    },
+  });
+
+  const { mutate: checkRoom, isPending: isCheckPending } = useMutation({
+    mutationFn: checkRoomExists,
+    onSuccess: (exists) => {
+      if (exists) {
+        router.push(`/room/${joinCode}`);
+      } else {
+        toast({
+          title: "Error",
+          description: "No such room exists.",
+          variant: "destructive",
+        });
+      }
+    },
   });
 
   const handleJoinRoom = () => {
-    if (joinCode) {
-      router.push(`/room/${joinCode}`);
+    if (joinCode.trim() === "") {
+      toast({
+        title: "Error",
+        description: "Please enter a room code.",
+        variant: "destructive",
+      });
+      return;
     }
+    checkRoom(joinCode);
   };
+
+  const isPending = isCreatePending || isCheckPending;
 
   return (
     <div className="mt-12 flex flex-col gap-4">
@@ -42,10 +71,14 @@ const RoomContainer = () => {
           className="bg-white"
           placeholder="Enter room code..."
         />
-        <Button onClick={handleJoinRoom}>Join Room</Button>
+        <Button disabled={isPending} onClick={handleJoinRoom}>
+          Join Room
+        </Button>
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error.message}</p> : null}
+      {createError ? (
+        <p className="text-sm text-red-600">{createError.message}</p>
+      ) : null}
     </div>
   );
 };
