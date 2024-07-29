@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     description: "Collect feedbacks and share easily over social media",
     type: "website",
     locale: "en_US",
-    url: "https://feedback.ashutoshrath.me",
+    url: "https://perception.ashutoshrath.me",
     images: [
       {
         url: "https://res.cloudinary.com/dhnkuonev/image/upload/v1722158086/Screenshot_2024-07-28_144256_sbny2d.png",
@@ -38,16 +38,16 @@ export default function RootLayout({
         <Providers>
           <div className="flex flex-col min-h-screen bg-grid-zinc-50">
             <div className="bg-transparent rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-80 p-4">
-              <div className="container mx-auto flex justify-between items-center">
+              <div className="container mx-auto flex flex-row justify-between items-center gap-4 sm:gap-0">
                 <Link href="/" className="text-xl font-bold">
                   Perception
                 </Link>
 
                 <a
-                  href="https://github.com/ashutosh-rath02/feedback"
+                  href="https://github.com/ashutosh-rath02/perception"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-transparent border-2 hover:bg-gray-100 px-2 py-2 rounded-md"
+                  className="bg-transparent border-2 hover:bg-gray-100 px-4 py-2 rounded-md text-sm sm:text-base"
                 >
                   ⭐ Star on GitHub
                 </a>
@@ -59,8 +59,10 @@ export default function RootLayout({
             </main>
 
             <div className="bg-transparent text-black p-4">
-              <div className="container mx-auto text-center flex flex-row items-center justify-between">
-                <p>&copy; 2024 Perception. All rights reserved.</p>
+              <div className="container mx-auto text-center flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
+                <p className="text-sm sm:text-base">
+                  &copy; 2024 Perception. All rights reserved.
+                </p>
                 <div className="">
                   <a
                     href="https://github.com/ashutosh-rath02"

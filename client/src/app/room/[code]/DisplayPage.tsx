@@ -11,7 +11,6 @@ import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
 import ShareDropdown from "@/components/ShareDropdown";
 
-// const socket = io("http://localhost:8080");
 const socket = io("https://feedback-zk2h.onrender.com");
 
 interface DisplayPageProps {
@@ -43,8 +42,8 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
   const generatePositions = useCallback((newSentences: typeof sentences) => {
     const boxWidth = 150;
     const boxHeight = 60;
-    const containerWidth = 800;
-    const containerHeight = 500;
+    const containerWidth = feedbackRef.current?.clientWidth || 800;
+    const containerHeight = feedbackRef.current?.clientHeight || 500;
     const padding = 10;
 
     const newPositions: { [key: string]: { x: number; y: number } } = {};
@@ -152,21 +151,25 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
 
   return (
     <div className="w-full flex flex-col items-center justify-between min-h-screen">
-      <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl">
-        <div className="flex justify-between items-center w-full">
-          <h1 className="text-3xl font-bold text-gray-900">
+      <SectionContainer className="flex flex-col items-center gap-6 w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4 sm:gap-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Room: <span className="text-blue-600">{roomCode}</span>
           </h1>
           <div className="flex gap-2">
             <ShareDropdown roomCode={roomCode} />
-            <Button onClick={takeScreenshot} variant="outline">
+            <Button
+              onClick={takeScreenshot}
+              variant="outline"
+              className="text-sm"
+            >
               Take Screenshot
             </Button>
           </div>
         </div>
         <div
           ref={feedbackRef}
-          className="background relative w-full h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden"
+          className="background relative w-full h-[300px] sm:h-[400px] md:h-[500px] border border-gray-200 rounded-lg p-4 overflow-hidden"
         >
           {sentences.map((sentence) => (
             <motion.div
@@ -175,8 +178,8 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               style={{
-                fontSize: `${Math.min(14 + sentence.value, 24)}px`,
-                width: "150px",
+                fontSize: `${Math.min(12 + sentence.value, 20)}px`,
+                width: "120px",
                 backgroundColor:
                   colorMap[sentence.text] || generateRandomColor(),
                 color: "black",
@@ -195,7 +198,7 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
         </div>
 
         <div className="w-full max-w-lg">
-          <div className="mt-1 flex gap-2 items-center">
+          <div className="mt-1 flex flex-col sm:flex-row gap-2 items-center">
             <Input
               value={input}
               onChange={({ target }) => setInput(target.value)}
@@ -208,6 +211,7 @@ const DisplayPage = ({ roomCode, initialData }: DisplayPageProps) => {
                 mutate({ feedback: input, roomCode });
                 setInput("");
               }}
+              className="w-full sm:w-auto"
             >
               Share
             </Button>
